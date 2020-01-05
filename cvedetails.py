@@ -12,11 +12,10 @@ URL = ("http://www.cvedetails.com/json-feed.php?numrows=30"
 
 USER_AGENT = 'Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:71.0) Gecko/20100101 Firefox/71.0'
 
-if __name__ == "__main__":
-    params = ('Apache', 'HTTP Server', '2.4.2')
+def get_cve_data_json(vendor, product, version):
+    params = (vendor, product, version)
     quoted_params = tuple(urllib.parse.quote(param) for param in params)
     full_url = URL % quoted_params
-    print(full_url)
     request_config = urllib.request.Request(
         full_url, 
         data = None, 
@@ -26,4 +25,9 @@ if __name__ == "__main__":
     )
     request = urllib.request.urlopen(request_config)
     raw_data = request.read()
-    print(raw_data)
+    encoding = request.info().get_content_charset('utf-8')
+    return json.loads(raw_data.decode(encoding))
+
+if __name__ == "__main__":
+    params = ('Apache', 'HTTP Server', '2.4.2')
+    print(json.dumps(get_cve_data_json(*params), indent=4, sort_keys=True))
