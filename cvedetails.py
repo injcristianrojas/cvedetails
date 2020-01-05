@@ -3,6 +3,7 @@
 import urllib.request
 import urllib.parse
 import json
+import argparse
 
 URL = ("http://www.cvedetails.com/json-feed.php?numrows=30"
 "&vendor_id=%s"
@@ -29,5 +30,19 @@ def get_cve_data_json(vendor, product, version):
     return json.loads(raw_data.decode(encoding))
 
 if __name__ == "__main__":
-    params = ('Apache', 'HTTP Server', '2.4.2')
+    
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--vendor", help="Vendor (optional)", action="store", default="0", dest="vendor"
+    )
+    parser.add_argument(
+        "--product", help="Product (required)", action="store", required=True, dest="product"
+    )
+    parser.add_argument(
+        "--version", help="Version (required)", action="store", required=True, dest="version"
+    )
+    args = parser.parse_args()
+    
+    params = (args.vendor, args.product, args.version)
     print(json.dumps(get_cve_data_json(*params), indent=4, sort_keys=True))
+
